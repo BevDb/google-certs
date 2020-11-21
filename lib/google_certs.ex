@@ -123,6 +123,11 @@ defmodule GoogleCerts do
     end
   end
 
+  defp map_certificates(certs = %Certificates{version: "firebase"}, body) do
+    Enum.reduce(body, certs, fn {kid, cert}, acc ->
+      Certificates.add_cert(acc, kid, cert)
+    end)
+  end
   defp map_certificates(certs = %Certificates{version: 1}, body) do
     Enum.reduce(body, certs, fn {kid, cert}, acc ->
       Certificates.add_cert(acc, kid, cert)
@@ -139,6 +144,7 @@ defmodule GoogleCerts do
 
   defp certificate_uri_path(1), do: {:ok, "/oauth2/v1/certs"}
   defp certificate_uri_path(3), do: {:ok, "/oauth2/v3/certs"}
+  defp certificate_uri_path("firebase"), do: {:ok, "/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com"}
   defp certificate_uri_path(_), do: {:error, :no_cert_version_path}
 
   defp max_age(headers) do

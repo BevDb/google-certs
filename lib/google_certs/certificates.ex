@@ -8,6 +8,7 @@ defmodule GoogleCerts.Certificate do
 
   kid is the id and cert can either be a map with a pem or a JWK map
 
+  version "firebase" cert is `%{"pem" => "-----BEGIN CERTIFICATE----- ..."}`
   version 1 cert is `%{"pem" => "-----BEGIN CERTIFICATE----- ..."}`
   version 3 cert is `%{"kid" => "53c66aab5...". "e" => "AQAB", ...}`
   """
@@ -77,6 +78,13 @@ defmodule GoogleCerts.Certificates do
   end
 
   @spec add_cert(Certificates.t(), String.t(), map) :: Certificates.t()
+  def add_cert(struct = %__MODULE__{certs: certs, version: "firebase"}, kid, cert) do
+    %__MODULE__{
+      struct
+      | certs: [%Certificate{kid: kid, cert: %{"pem" => cert}} | certs]
+    }
+  end
+
   def add_cert(struct = %__MODULE__{certs: certs, version: 1}, kid, cert) do
     %__MODULE__{
       struct
